@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<title>Raphael.js Graph</title>
+		<style>
+			body{
+				background: #333;
+				color: white;
+			}
+			#graph-a{
+				position:relative;
+			}
+			.graph-a-data{
+				position:absolute;
+			}
+			
+		</style>
+		
+	</head>
+	<body>
+		<div id="graph-a"></div>
+		<div class="graph-a-data"></div>
+		
+		
+		<script src='js/jquery/jquery-2.0.3.min.js'></script>
+		<script src="js/raphaeljs/raphael-min.js"></script>
+		<script src="js/popup.js"></script>
+		<script src="js/graph.js"></script>
+		<script>
+			var data = [100,120,140,160,200,150,130,110,100,80,70,60,30,50,20,10,10,10,10];
+			var a = new RJSGraph("graph-a", {
+				 "graphPortion" : "bottom"
+			});
+			a.init(data);
+			var b = new RJSGraph("graph-a", {
+				 "graphPortion" : "top"
+			});
+			b.init(data);
+			
+			$(window).resize(function(){
+				a.redraw();
+				b.redraw();
+			});
+			
+		</script>
+	</body>
+</html>
