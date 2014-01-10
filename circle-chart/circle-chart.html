@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		<meta charset='utf-8'>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<title>Raphael.js test</title>
+		<style>
+			body{
+				background: #000;
+				color: white;
+			}
+			.round-chart{
+				position:relative;
+			}
+			.percentLine{
+				position:absolute;
+				font-size: 30px;
+				top: 42px;
+				left: 32px;
+			}
+		</style>
+		
+	</head>
+	<body>
+		<div id="circle-chart-b" class="round-chart"></div>
+		<div id="circle-chart-a" class="round-chart"></div>
+		
+		<script src='js/jquery/jquery-2.0.3.min.js'></script>
+		<script src="js/raphaeljs/raphael-min.js"></script>
+		<script src="js/chart.js"></script>
+		<script>
+			var a = new CircleChart("circle-chart-a", {
+				"radius" : 200,
+				"canvasSize" : 600,
+				"stroke" : 20
+			});
+			var b = new CircleChart("circle-chart-b");
+			a.callUpdate(70);
+			b.callUpdate(40);
+		</script>
+		
+	</body>
+	
+</html>
