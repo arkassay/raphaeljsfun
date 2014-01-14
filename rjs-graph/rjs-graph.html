@@ -9,40 +9,50 @@
 				background: #333;
 				color: white;
 			}
+			.graph-wrapper{
+				width: 90%;
+				margin: 0 auto;
+			}
 			#graph-a{
 				position:relative;
 			}
 			.graph-a-data{
 				position:absolute;
 			}
-			
+			svg{
+				margin-bottom: -4px;
+			}
 		</style>
 		
 	</head>
 	<body>
-		<div id="graph-a"></div>
-		<div class="graph-a-data"></div>
+		
+		<div class="graph-wrapper">
+			<div id="graph-a"></div>
+			<div class="graph-a-data"></div>
+		</div>
 		
 		
 		<script src='js/jquery/jquery-2.0.3.min.js'></script>
 		<script src="js/raphaeljs/raphael-min.js"></script>
 		<script src="js/popup.js"></script>
-		<script src="js/graph.js"></script>
+		<script src="js/graph2.js"></script>
 		<script>
 			var data = [100,120,140,160,200,150,130,110,100,80,70,60,30,50,20,10,10,10,10];
-			var a = new RJSGraph("graph-a", {
+			var a = new RJSGraph("graph-a", "one", {
 				 "graphPortion" : "bottom"
 			});
 			a.init(data);
-			var b = new RJSGraph("graph-a", {
+			var b = new RJSGraph("graph-a", "two", {
 				 "graphPortion" : "top"
 			});
 			b.init(data);
 			
-			$(window).resize(function(){
+			/*$(window).resize(function(){
 				a.redraw();
 				b.redraw();
-			});
+			});*/
+			
 			
 		</script>
 	</body>

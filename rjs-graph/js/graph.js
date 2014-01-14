@@ -63,13 +63,14 @@ function RJSGraph( canvas, options ) {
 		        leave_timer,
 		        blanket = gvar.r.set();
 		        
-			var p, bgpp;
+			var p, bgpp, points;
 			for (var i = 0, ii = gvar.labels.length; i < ii; i++) {
 		        if(gc.graphPortion == "top") var y = Math.round((gc.height - gc.bottomgutter - Y * data[i])); 
 				else var y = Math.round((gc.height - gc.bottomgutter - Y * data[i])-graphBaselineY);
 		        var x = Math.round(gc.leftgutter + X * (i + .5));	
 		        if (!i) {
 		            p = ["M", x, y, "C", x, y];
+					points = ["M", x, y, "C", x, y];
 					if(gc.graphPortion == "top")bgpp = ["M", gc.leftgutter + X * .5, gc.height - gc.bottomgutter, "L", x, y, "C", x, y];
 					else bgpp = ["M", gc.leftgutter + X * .5, 0, "L", x, y, "C", x, y];
 		        }
@@ -79,23 +80,29 @@ function RJSGraph( canvas, options ) {
 		                Y2 = Math.round(gc.height - gc.bottomgutter - Y * data[i + 1]),
 		                X2 = Math.round(gc.leftgutter + X * (i + 1.5));
 		            var a = gvar.getAnchors(X0, Y0, x, y, X2, Y2);
-		            p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
-		            bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
+				
+		            points = points.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
+					p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
+					//path.animate({path: p}, 1000);
+					bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
+					//bgp.animate({path: bgpp}, 1000);
 		        }
 				var dot2 = gvar.r.circle(x, y, 4).attr({fill: "#333", stroke: color, "stroke-width": 2});
 				
 				if(gc.graphPortion == "top"){
 					if(gvar.labels[i] != ""){
-						var line = gvar.r.path("M"+x+","+y+"L"+x+","+20).attr({"stroke-width": 1, stroke: "#FFFFFF"}).toFront();
+						var line = gvar.r.path("M"+x+","+y).attr({"stroke-width": 1, stroke: "#FFFFFF"}).toFront();
+						//var line = gvar.r.path("M"+x+","+y+"L"+x+","+20).attr({"stroke-width": 1, stroke: "#FFFFFF"}).toFront();
+						var anim = Raphael.animation({path: "M"+x+","+y+"L"+x+","+20}, 1500, "<>");
+						line.animate(anim);
 					}
-					t = gvar.r.text(x, 10, gvar.labels[i]).attr(txt).toFront()
+					t = gvar.r.text(x, 10, gvar.labels[i]).attr(txt).toFront();
 				}
 		        /*DATA ON HOVER*/
 				blanket.push(gvar.r.rect(gc.leftgutter + X * i, 0, X, gc.height - gc.bottomgutter).attr({stroke: "none", fill: "#fff", opacity: 0}));
 		        var rect = blanket[blanket.length - 1];
 				(function (x, y, data, lbl, line, dot2) {
 					rect.hover(function(){
-						
 						$('.'+canvas+'-data').html(data);
 						$('#'+canvas).on('mousemove', function(e){
 							$('.'+canvas+'-data').css({
@@ -121,8 +128,11 @@ function RJSGraph( canvas, options ) {
 		    
 		    if(gc.graphPortion == "top") bgpp = bgpp.concat([x, y, x, y, "L", x, gc.height - gc.bottomgutter, "z"]);
 			else bgpp = bgpp.concat([x, y, x, y, "L", x, 0, "z"]);
-			
-		    path.attr({path: p});
+		
+		    //path.animate({path: p}, 1000);
+			pointsGraph = gvar.r.path(points).attr({stroke: color, "stroke-width": 4, "stroke-linejoin": "round"});
+			pointsGraph.animate({path: points}, 1000);
+			//path.attr({path: p});
 		    bgp.attr({path: bgpp});
 		
 		console.log( gvar );
