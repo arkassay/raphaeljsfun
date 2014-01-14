@@ -1,8 +1,3 @@
-Raphael.el.addClass = function(className) {
-    this.node.setAttribute("class", className);
-    return this;
-};
-
 function RJSGraph( canvas, id, options ) {
 	var gvar = {};
 	gvar.options = options;
@@ -13,27 +8,27 @@ function RJSGraph( canvas, id, options ) {
 	     "topgutter" : 40,
 		 "graphPortion" : (gvar.options.graphPortion) ? gvar.options.graphPortion : "top",
 		 "timing" : 700,
-		  "dot2"  : {}
+		  "dot2"  : {},
+		"square2" : {}
 	}			
 	gvar.init = function(data){
 		var max = Math.max.apply(Math, data),
 			line,
 			shadingPath,
 			values = [];
-		gvar.canvasHeight = 100;
-		gvar.Y = gvar.canvasHeight/max;
+		gvar.Y = gvar.options.height/max;
 		gvar.containerWidth = $(".graph-wrapper").width();
 		gvar.labels = [2000,"","","","",2005,"","","","",2010,"","","","",2015,"","",2018];
 		gvar.baseLine = data[0];  //get the data for 2000
 		// Draw
 		//initialize the graph
-		gvar.graphBaselineY = Math.round(gvar.canvasHeight - gvar.Y * gvar.baseLine)+gvar.options.topgutter;
+		gvar.graphBaselineY = Math.round(gvar.options.height - gvar.Y * gvar.baseLine)+gvar.options.topgutter;
 		if(gvar.options.graphPortion == "top"){
 			gvar.r = Raphael(canvas, gvar.containerWidth, gvar.graphBaselineY);
 			shadingPath = "L"+gvar.containerWidth+",100 10,100z";
 		}
 		else{
-			gvar.r = Raphael(canvas, gvar.containerWidth, gvar.canvasHeight - gvar.graphBaselineY+gvar.options.topgutter);
+			gvar.r = Raphael(canvas, gvar.containerWidth, gvar.options.height - gvar.graphBaselineY+gvar.options.topgutter);
 			shadingPath = "L"+gvar.containerWidth+",0 10,0z";
 		}
 		gvar.c = gvar.r.path("M0,0").attr({fill: "none", "stroke-width": 2, "stroke-linecap": "round"}),
@@ -55,7 +50,12 @@ function RJSGraph( canvas, id, options ) {
 	}
 	
 	gvar.labelPoint = function(index, x, y, value){
-		gvar.options.dot2[index] = gvar.r.circle(x, y, 4).attr({fill: "#333", stroke: "#FFF", "stroke-width": 2}).data("pointInfo", value);
+		if(gvar.options.graphPortion == "top") clr = "#FFF";
+		else clr = "#FF0000";
+		//blanket = gvar.r.set();
+		//blanket.push(gvar.r.rect((x-25), y, 50, 100).attr({"stroke-width": 0}).data("pointInfo", value));
+		gvar.options.dot2[index] = gvar.r.circle(x, y, 4).attr({fill: clr,"stroke-width": 0}).data("pointInfo", value);
+		
 		if(gvar.options.graphPortion == "top" && gvar.labels[index] !== ""){
 			line = gvar.r.path("M"+x+","+(gvar.graphBaselineY-10)).attr({"stroke-width": 1, stroke: "#FFFFFF"});
 			var anim = Raphael.animation({path: "M"+x+","+(gvar.graphBaselineY-10)+"L"+x+",20"}, gvar.options.timing, "<>");
@@ -67,27 +67,30 @@ function RJSGraph( canvas, id, options ) {
 		}
 		
 		gvar.options.dot2[index].hover(function(){
-			gvar.options.dot2[index].attr("r", 6);
+			//gvar.options.dot2[index].attr("r", 6);
+			console.log(this.data('pointInfo'))
 			$('.'+canvas+'-data').html(this.data('pointInfo'));
 			$('#'+canvas).on('mousemove', function(e){
 				$('.'+canvas+'-data').css({
 			       left:  e.pageX-10,
-			       top:   e.pageY-20
+			       top:   e.pageY-30
 			    });
 			});
-			$('#'+canvas).mouseover(function(){
+			$("circle").mouseenter(function(){
 				$('.'+canvas+'-data').css('display' , 'block');
 			});
-			$('#'+canvas).mouseout(function(){
+			$('circle').mouseout(function(){
 				$('.'+canvas+'-data').css('display' , 'none').html("");
 			});
 		}, function(){
-			gvar.options.dot2[index].attr("r", 4);
+			//gvar.options.dot2[index].attr("r", 4);
 		});
 	}
 	gvar.setPath = function(length,data2){
-		var path = "",
-            spacing = gvar.containerWidth/length,
+		
+			if($(window).width() < 1024) spacing = gvar.containerWidth/(length-.65);
+			else spacing = gvar.containerWidth/(length-.75);
+			var path = "",
 			x = 10
 			if(gvar.options.graphPortion == "bottom") y = 0;
 			else y = gvar.graphBaselineY; 
@@ -104,14 +107,14 @@ function RJSGraph( canvas, id, options ) {
 	}
 	gvar.changePath = function(length,data){
 		var path = "",
-			spacing = gvar.containerWidth/length,
+			spacing = gvar.containerWidth/(length-1),
             x = 10, y = data;
         for (var i = 0; i < length; i++) {
 			if(gvar.options.graphPortion == "bottom"){
-				ypos = (gvar.canvasHeight - gvar.Y * y[i])-gvar.graphBaselineY+gvar.options.topgutter;
+				ypos = (gvar.options.height - gvar.Y * y[i])-gvar.graphBaselineY+gvar.options.topgutter;
 			}
 			else{
-				ypos = gvar.canvasHeight - gvar.Y * y[i]+gvar.options.topgutter;
+				ypos = gvar.options.height - gvar.Y * y[i]+gvar.options.topgutter;
 			}
             
 			if (i) {
@@ -120,8 +123,12 @@ function RJSGraph( canvas, id, options ) {
             } else {
                 path += "M" + [10, ypos] + "R";
             }
-		if(gvar.options.graphPortion == "top") gvar.options.dot2[i].animate({transform: "t0, "+(ypos-gvar.graphBaselineY)+"r90"}, gvar.options.timing, "<>");
-		else gvar.options.dot2[i].animate({transform: "t0, "+ypos+"r90"}, gvar.options.timing, "<>");
+		if(gvar.options.graphPortion == "top"){
+			gvar.options.dot2[i].animate({transform: "t0, "+(ypos-gvar.graphBaselineY)+"r90"}, gvar.options.timing, "<>");
+		} 
+		else{
+			gvar.options.dot2[i].animate({transform: "t0, "+ypos+"r90"}, gvar.options.timing, "<>");
+		} 
         }
         return path;
 	}
